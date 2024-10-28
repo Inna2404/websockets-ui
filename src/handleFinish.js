@@ -1,11 +1,7 @@
-import { WebSocket } from "ws";
 import { sendMessage } from "./server";
 import { games } from "./handleAddUserToRoom";
 
-export function handleFinish(
-  ws: WebSocket,
-  data: { roomId: string; winnerId: string }
-) {
+export function handleFinish(ws, data) {
   const { roomId, winnerId } = data;
 
   if (games[roomId]) {

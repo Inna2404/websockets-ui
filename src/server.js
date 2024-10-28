@@ -1,5 +1,6 @@
 import WebSocket, { WebSocketServer } from "ws";
 import dotenv from "dotenv";
+import express from "express";
 import { handleRegistration } from "./handleRegistration";
 import { handleCreateRoom } from "./handleCreateRoom";
 import { handleAddUserToRoom } from "./handleAddUserToRoom";
@@ -10,13 +11,27 @@ import { HTTP_PORT } from "../index";
 
 dotenv.config();
 const PORT = process.env.PORT || HTTP_PORT;
-const wss = new WebSocketServer({ port: Number(PORT) });
 
-export function sendMessage(ws: WebSocket, type: string, data: any) {
-  ws.send(JSON.stringify({ type, data }));
+const app = express();
+
+app.use(express.static("public"));
+
+const server = app.listen(PORT, () => {
+  console.log(`HTTP server started at http://localhost:${PORT}`);
+});
+
+export function sendMessage(ws, type, data) {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type, data }));
+  } else {
+    console.error("WebSocket is not open. Current state: ", ws.readyState);
+  }
 }
+const wss = new WebSocketServer({ server });
 
 wss.on("connection", (ws) => {
+  console.log("New client connected");
+
   ws.on("message", (message) => {
     const { type, data } = JSON.parse(message.toString());
 
@@ -46,5 +61,12 @@ wss.on("connection", (ws) => {
         sendMessage(ws, "error", { message: "Unknown command" });
     }
   });
+  ws.onclose = () => {
+    console.log("WebSocket connection closed");
+  };
+
+  ws.onerror = (error) => {
+    console.error("WebSocket error: ", error);
+  };
 });
 console.log(`WebSocket server start at port ${PORT}`);

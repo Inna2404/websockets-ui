@@ -1,11 +1,7 @@
-import { WebSocket } from "ws";
-import { players } from "./handleRegistration";
-import { sendMessage } from "./server";
+import { players } from "./handleRegistration.js";
+import { sendMessage } from "./server.js";
 
-export function handleAddShipts(
-  ws: WebSocket,
-  data: { playerId: string; ships: number[][] }
-) {
+export function handleAddShipts(ws, data) {
   const { playerId, ships } = data;
 
   if (players[playerId]) {

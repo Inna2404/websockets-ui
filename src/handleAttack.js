@@ -1,11 +1,7 @@
-import { WebSocket } from "ws";
-import { sendMessage } from "./server";
-import { games } from "./handleAddUserToRoom";
+import { sendMessage } from "./server.js";
+import { games } from "./handleAddUserToRoom.js";
 
-export function handleAttack(
-  ws: WebSocket,
-  data: { roomId: string; attackerId: string; x: number; y: number }
-) {
+export function handleAttack(ws, data) {
   const { roomId, attackerId, x, y } = data;
   const game = games[roomId];
 
